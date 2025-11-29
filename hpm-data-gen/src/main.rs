@@ -1,4 +1,4 @@
-use std::{collections::HashMap, path::Path};
+use std::path::Path;
 
 mod dma;
 mod interrupts;
@@ -97,15 +97,16 @@ fn main() -> anyhow::Result<()> {
 
     for chip in &mut chips {
         for core in &mut chip.cores {
-            if let Some(inc_path) = core.include_interrupts.take() {
-                let interrupts_yaml_path = meta_yaml_path.parent().unwrap().join(&inc_path);
-                let content = std::fs::read_to_string(&interrupts_yaml_path)?;
-                let interrupts: HashMap<String, u8> = serde_yaml::from_str(&content)?;
-                let mut interrupts: Vec<(String, u8)> = interrupts.into_iter().collect();
-                interrupts.sort_by_key(|(_, number)| *number);
+            // Load interrupts directly from SDK header file (always, no longer depends on YAML config)
+            core.include_interrupts.take(); // consume the field if it exists (for backward compatibility)
 
-                // println!("interrupts: {:#?}", interrupts);
-                for (name, number) in interrupts {
+            if let Some(interrupts) = interrupts::load_interrupts_from_header(&chip.name)? {
+                println!("    Loading interrupts from header for chip: {}", chip.name);
+
+                let mut sorted_interrupts: Vec<(String, u8)> = interrupts.into_iter().collect();
+                sorted_interrupts.sort_by_key(|(_, number)| *number);
+
+                for (name, number) in sorted_interrupts {
                     core.interrupts
                         .push(hpm_data_serde::chip::core::Interrupt { name, number });
                 }
@@ -115,6 +116,11 @@ fn main() -> anyhow::Result<()> {
                     name: format!("CORE_LOCAL"),
                     number: 0,
                 });
+            } else {
+                println!(
+                    "    ⚠️  No interrupts header found for chip: {}, skipping",
+                    chip.name
+                );
             }
 
             // append peripherals from includes

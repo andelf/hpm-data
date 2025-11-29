@@ -9,7 +9,10 @@ shift
 
 case "$CMD" in
     download-all)
-        git clone --depth 1 --branch v1.6.0 https://github.com/hpmicro/hpm_sdk.git
+        git clone --depth 1 --branch v1.10.0 https://github.com/hpmicro/hpm_sdk.git
+
+        echo Syncing SVDs from hpm_sdk...
+        find  hpm_sdk/soc -iname '*_svd.xml' -exec cp -v {} ./svd \;
     ;;
     install-chiptool)
         cargo install --git https://github.com/ch32-rs/chiptool
@@ -48,7 +51,7 @@ case "$CMD" in
     gen)
         rm -rf build/data
         RUST_BACKTRACE=1 cargo run -p hpm-data-gen
-        RUST_BACKTRACE=1 cargo run -p hpm-metapac-gen -- "HPM53*" "HPM67*" "HPM64*" "HPM62*" "HPM63*" "HPM68*" "HPM6E*"
+        RUST_BACKTRACE=1 cargo run -p hpm-metapac-gen -- "HPM53*" "HPM67*" "HPM64*" "HPM62*" "HPM63*" "HPM68*" "HPM6E*" "HPM6P*" "HPM5E*"
     ;;
     prepare-publish)
         cd build/hpm-metapac/
