@@ -44,7 +44,7 @@ jobs:
     - name: Test
       run: |
         cd build/hpm-metapac/
-        cargo doc --features hpm5361,metadata
+        cargo doc --features hpm5361,metadata,rt
     - name: Push
       run: |
         cd build/hpm-metapac/
