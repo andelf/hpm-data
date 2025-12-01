@@ -82,47 +82,39 @@ fn parse_signal(signal_name: &str, periph_name: &str) -> String {
 }
 
 pub fn handle_chip_dmamux_include<P: AsRef<Path>>(
-    path: P,
+    _path: P,
     chip: &mut hpm_data_serde::Chip,
 ) -> anyhow::Result<()> {
-    let _meta_yaml_path = path.as_ref();
+    // Load DMAMUX directly from SDK header file for all chips
+    let dmamux = if let Some(header_path) = get_dmamux_header_path(&chip.name) {
+        parse_dmamux_from_header(&header_path)?
+    } else {
+        println!(
+            "    ⚠️  No DMAMUX header found for chip: {}, skipping",
+            chip.name
+        );
+        return Ok(());
+    };
 
+    // Process the dmamux data for all cores
     for core in &mut chip.cores {
-        if let Some(_include_path) = core.include_dmamux.take() {
-            // Load DMAMUX directly from SDK header file (more accurate than YAML)
-            println!(
-                "    Loading DMAMUX from header file for chip: {}",
-                chip.name
-            );
+        // Clear deprecated include_dmamux field if present
+        let _ = core.include_dmamux.take();
 
-            let dmamux = if let Some(header_path) = get_dmamux_header_path(&chip.name) {
-                parse_dmamux_from_header(&header_path)?
-            } else {
-                println!(
-                    "    ⚠️  No DMAMUX header found for chip: {}, skipping",
-                    chip.name
-                );
-                continue;
-            };
+        for (signal_name, request_no) in &dmamux {
+            for periph in core.peripherals.iter_mut() {
+                let signal_periph_prefix =
+                    signal_name.split('_').next().expect("empty signal_name");
+                if periph.name == signal_periph_prefix {
+                    let signal = parse_signal(signal_name, &periph.name);
 
-            // Process the dmamux data (same logic for both YAML and header sources)
-            for (signal_name, request_no) in dmamux {
-                for periph in core.peripherals.iter_mut() {
-                    let signal_periph_prefix =
-                        signal_name.split('_').next().expect("empty signal_name");
-                    if periph.name == signal_periph_prefix {
-                        // println!("matches signal_name: {:#?}", signal_name);
-
-                        let signal = parse_signal(&signal_name, &periph.name);
-
-                        periph.dma_channels.push(
-                            hpm_data_serde::chip::core::peripheral::DmaChannel {
-                                signal: signal.clone(),
-                                dmamux: Some("DMAMUX".to_string()),
-                                request: request_no as u8,
-                            },
-                        );
-                    }
+                    periph
+                        .dma_channels
+                        .push(hpm_data_serde::chip::core::peripheral::DmaChannel {
+                            signal: signal.clone(),
+                            dmamux: Some("DMAMUX".to_string()),
+                            request: *request_no as u8,
+                        });
                 }
             }
         }
