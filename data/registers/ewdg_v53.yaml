@@ -1,4 +1,4 @@
-block/WDG:
+block/EWDG:
   description: EWDG0.
   items:
     - name: CTRL0

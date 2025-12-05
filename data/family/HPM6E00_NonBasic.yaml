@@ -201,18 +201,18 @@
     version: v6e
     block: TMR
 
-- name: WDG2
+- name: EWDG2
   address: 0xF00B8000
   registers:
-    kind: wdg
+    kind: ewdg
     version: v53
-    block: WDG
-- name: WDG3
+    block: EWDG
+- name: EWDG3
   address: 0xF00BC000
   registers:
-    kind: wdg
+    kind: ewdg
     version: v53
-    block: WDG
+    block: EWDG
 
 - name: SDM1
   address: 0xF0454000

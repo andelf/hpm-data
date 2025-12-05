@@ -316,24 +316,24 @@
     version: common
     block: TMR
 
-- name: WDG0
+- name: EWDG0
   address: 0xF00B0000
   registers:
-    kind: wdg
+    kind: ewdg
     version: v68
-    block: WDG
-- name: WDG1
+    block: EWDG
+- name: EWDG1
   address: 0xF00B4000
   registers:
-    kind: wdg
+    kind: ewdg
     version: v68
-    block: WDG
+    block: EWDG
 - name: PWDG
   address: 0xF4128000
   registers:
-    kind: wdg
+    kind: ewdg
     version: v68
-    block: WDG
+    block: EWDG
 
 - name: RTCSHW
   address: 0xF421C000
