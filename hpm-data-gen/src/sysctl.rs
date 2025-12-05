@@ -60,8 +60,35 @@ static HPM6E00_SYSCTL: LazyLock<SysctlInfo> = LazyLock::new(|| {
     .expect("Failed to load HPM6E00 sysctl info")
 });
 
+/// Normalize HPM6700 SDK names to 4-char format for consistency with other series.
+/// HPM6700 is the earliest chip in the HPMicro series, so its SDK uses full names.
+fn normalize_hpm67_sdk_name(name: &str) -> String {
+    let mut name = name
+        .replace("GPTMR", "TMR")
+        .replace("UART", "URT")
+        .replace("MCHTMR", "MCT")
+        .replace("NTMR", "NTM")
+        .replace("SDXC", "SDC")
+        .replace("ENET", "ETH");
+
+    // Handle special cases without number suffix
+    name = match name.as_str() {
+        "HDMA" => "DMA0".to_string(),
+        "XDMA" => "DMA1".to_string(),
+        "SDP" => "SDP0".to_string(),
+        "RNG" => "RNG0".to_string(),
+        "KEYM" => "KMAN".to_string(),
+        "PDM" => "PDM0".to_string(),
+        "ROM" => "ROM0".to_string(),
+        _ => name,
+    };
+
+    name
+}
+
 #[derive(Debug, Clone)]
 pub struct SysctlInfo {
+    #[allow(dead_code)]
     pub chip_family: String,
     // for resources register
     pub resources: HashMap<String, u32>,
@@ -71,11 +98,10 @@ pub struct SysctlInfo {
 
 impl SysctlInfo {
     // SDK name is 4 char name, like MCT0, CAN0, TMR0, etc.
-    // Here, we need to convert it to the peripheral name used in hpm-data.
+    // Here, we need to convert peripheral name to SDK name for lookup.
     fn peripheral_name_to_sdk_name(&self, name: &str) -> String {
-        // convert peripheral name to SDK name
-        let mut trans: HashMap<_, _> = [
-            ("MCHTMR", "MCT"), // how to handle dual-core?
+        let trans: &[(&str, &str)] = &[
+            ("MCHTMR", "MCT"),
             ("GPTMR", "TMR"),
             ("OPAMP", "OPA"),
             ("UART", "URT"),
@@ -89,28 +115,22 @@ impl SysctlInfo {
             ("SDP", "SDP0"),
             ("NTMR", "NTM"),
             ("SDXC", "SDC"),
+            ("ENET", "ETH"),
             ("PPI", "PPI0"),
             ("SEI", "SEI0"),
             ("RNG", "RNG0"),
             ("TSW", "TSW0"),
             ("PLB", "PLB0"),
-        ]
-        .into_iter()
-        .collect();
-        if self.chip_family.starts_with("HPM53")
-            || self.chip_family.starts_with("HPM62")
-            || self.chip_family.starts_with("HPM68")
-            || self.chip_family.starts_with("HPM6E")
-        {
-            trans.insert("MCAN", "CAN");
-        }
-        if self.chip_family.starts_with("HPM63") {
-            trans.insert("HDMA", "DMA0");
-            trans.insert("XDMA", "DMA1");
-        }
+            ("PDM", "PDM0"),
+            // HPM53/HPM62/HPM68/HPM6E use MCAN -> CAN
+            ("MCAN", "CAN"),
+            // HPM63/HPM67 use HDMA/XDMA -> DMA0/DMA1
+            ("HDMA", "DMA0"),
+            ("XDMA", "DMA1"),
+        ];
 
         let mut pname = name.to_string();
-        for (k, v) in &trans {
+        for (k, v) in trans {
             if pname.starts_with(*k) {
                 pname = pname.replace(k, v);
                 break;
@@ -119,36 +139,14 @@ impl SysctlInfo {
 
         pname
     }
+
     fn get_resource(&self, name: &str) -> Option<u32> {
-        // applies to HPM6700 and HPM6400
-        if self.chip_family == "HPM6700" {
-            return self.resources.get(name).copied();
-        }
-
         let pname = self.peripheral_name_to_sdk_name(name);
-
         self.resources.get(&pname).copied()
-
-        /*
-            let mot_pname = pname
-                .replace("PWM", "MOT")
-                .replace("HALL", "MOT")
-                .replace("QEI", "MOT")
-                .replace("TRGM", "MOT")
-                .replace("MOT", "PWM");
-            self.resources.get(&mot_pname).copied()
-        })
-        */
     }
 
     fn get_clock(&self, name: &str) -> Option<u32> {
-        // applies to HPM6700 and HPM6400
-        if self.chip_family == "HPM6700" {
-            return self.clocks.get(name).copied();
-        }
-
         let pname = self.peripheral_name_to_sdk_name(name);
-
         self.clocks.get(&pname).copied()
     }
 
@@ -166,6 +164,8 @@ fn load_sysctl_info_from_header<P: AsRef<Path>>(
     let content = std::fs::read_to_string(&header_path)
         .expect(format!("Failed to read file: {:?}", header_path.as_ref().display()).as_str());
 
+    let is_hpm67 = chip_family.starts_with("HPM67") || chip_family.starts_with("HPM64");
+
     // #define SYSCTL_RESOURCE_MCT0 (258UL)
     // => MCT0: 258
     let resource_pattern =
@@ -173,10 +173,11 @@ fn load_sysctl_info_from_header<P: AsRef<Path>>(
     let resources: HashMap<String, u32> = resource_pattern
         .captures_iter(&content)
         .map(|cap| {
-            (
-                cap.get(1).unwrap().as_str().to_string(),
-                cap.get(2).unwrap().as_str().parse().unwrap(),
-            )
+            let mut name = cap.get(1).unwrap().as_str().to_string();
+            if is_hpm67 {
+                name = normalize_hpm67_sdk_name(&name);
+            }
+            (name, cap.get(2).unwrap().as_str().parse().unwrap())
         })
         .collect();
 
@@ -188,21 +189,21 @@ fn load_sysctl_info_from_header<P: AsRef<Path>>(
     let mut clocks: HashMap<String, u32> = clock_top_pattern
         .captures_iter(&content)
         .map(|cap| {
-            (
-                cap.get(1).unwrap().as_str().to_string(),
-                cap.get(2).unwrap().as_str().parse().unwrap(),
-            )
+            let mut name = cap.get(1).unwrap().as_str().to_string();
+            if is_hpm67 {
+                name = normalize_hpm67_sdk_name(&name);
+            }
+            (name, cap.get(2).unwrap().as_str().parse().unwrap())
         })
         .collect();
 
-    // Fix: `#define SYSCTL_CLOCK_CLK_TOP_MCHTMR (3UL)`
-    if chip_family.starts_with("HPM67") || chip_family.starts_with("HPM64") {
-        if let Some(i) = clocks.remove("MCHTMR") {
-            clocks.insert("MCHTMR1".to_string(), i);
+    // Fix: HPM67 has single `MCHTMR` clock which is actually for core1 (MCHTMR1)
+    // After normalization, it becomes `MCT`, we rename it to `MCT1`
+    if is_hpm67 {
+        if let Some(i) = clocks.remove("MCT") {
+            clocks.insert("MCT1".to_string(), i);
         }
     }
-    // println!("resources: {:#?}", resources);
-    // println!("clocks: {:#?}", clocks);
 
     println!(
         "    Load SYSCTL for {}: {} resources, {} clocks",
