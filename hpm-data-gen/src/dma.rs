@@ -38,7 +38,8 @@ fn parse_dmamux_from_header(header_path: &Path) -> anyhow::Result<HashMap<String
 }
 
 /// Get dmamux header path for chip
-fn get_dmamux_header_path(chip_name: &str) -> Option<PathBuf> {
+/// Returns (Option<PathBuf>, Option<&'static str>) - (found_path, warning_message)
+fn get_dmamux_header_path(chip_name: &str) -> (Option<PathBuf>, Option<String>) {
     let sdk_path = std::env::var("HPM_SDK_BASE")
         .map(PathBuf::from)
         .unwrap_or_else(|_| std::env::current_dir().unwrap().join("./hpm_sdk"));
@@ -55,13 +56,27 @@ fn get_dmamux_header_path(chip_name: &str) -> Option<PathBuf> {
         n if n.starts_with("HPM68") => sdk_path.join("soc/HPM6800/HPM6880/hpm_dmamux_src.h"),
         n if n.starts_with("HPM6E") => sdk_path.join("soc/HPM6E00/HPM6E80/hpm_dmamux_src.h"),
         n if n.starts_with("HPM6P") => sdk_path.join("soc/HPM6P00/HPM6P81/hpm_dmamux_src.h"),
-        _ => return None,
+        _ => {
+            return (
+                None,
+                Some(format!(
+                    "Unknown chip family for DMAMUX: {}, skipping DMA channel generation",
+                    chip_name
+                )),
+            )
+        }
     };
 
     if header_path.exists() {
-        Some(header_path)
+        (Some(header_path), None)
     } else {
-        None
+        (
+            None,
+            Some(format!(
+                "DMAMUX header not found: {:?}, skipping DMA channel generation",
+                header_path
+            )),
+        )
     }
 }
 
@@ -86,13 +101,14 @@ pub fn handle_chip_dmamux_include<P: AsRef<Path>>(
     chip: &mut hpm_data_serde::Chip,
 ) -> anyhow::Result<()> {
     // Load DMAMUX directly from SDK header file for all chips
-    let dmamux = if let Some(header_path) = get_dmamux_header_path(&chip.name) {
-        parse_dmamux_from_header(&header_path)?
+    let (header_path, warning) = get_dmamux_header_path(&chip.name);
+
+    let dmamux = if let Some(path) = header_path {
+        parse_dmamux_from_header(&path)?
     } else {
-        println!(
-            "    ⚠️  No DMAMUX header found for chip: {}, skipping",
-            chip.name
-        );
+        if let Some(msg) = warning {
+            println!("    ⚠️  {}", msg);
+        }
         return Ok(());
     };
 

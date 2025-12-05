@@ -646,6 +646,7 @@ fn gen_memory_x(out_dir: &Path, chip: &Chip) {
     }
     write!(memory_x, "}}").unwrap();
 
+    // Standard riscv-rt regions
     write!(
         memory_x,
         r#"
@@ -655,7 +656,19 @@ REGION_ALIAS("REGION_DATA", DLM);
 REGION_ALIAS("REGION_BSS", DLM);
 REGION_ALIAS("REGION_HEAP", DLM);
 REGION_ALIAS("REGION_STACK", DLM);
-    "#
+"#
+    )
+    .unwrap();
+
+    // HPMicro extensions for hpm-riscv-rt
+    write!(
+        memory_x,
+        r#"
+/* HPMicro extensions */
+REGION_ALIAS("REGION_FASTTEXT", ILM);
+REGION_ALIAS("REGION_FASTDATA", DLM);
+REGION_ALIAS("REGION_NONCACHEABLE_RAM", DLM);
+"#
     )
     .unwrap();
 
