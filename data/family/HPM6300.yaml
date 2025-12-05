@@ -352,6 +352,28 @@
     version: v67
     block: I2C
 
+# audio peripherals
+
+- name: I2S0
+  address: 0xF0100000
+  registers:
+    kind: i2s
+    version: common
+    block: I2S
+- name: I2S1
+  address: 0xF0104000
+  registers:
+    kind: i2s
+    version: common
+    block: I2S
+
+- name: PDM
+  address: 0xF0114000
+  registers:
+    kind: pdm
+    version: common
+    block: PDM
+
 - name: PTPC
   address: 0xF00B0000
   registers:
