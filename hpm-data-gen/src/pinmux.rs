@@ -41,7 +41,7 @@ struct PinmuxRaw {
 // The following peripherals are supported now.
 const PERIPHERAL_LIST: &[&str] = &[
     "GPTMR", "I2C", "SPI", "UART", "MCAN", "USB", "I2S", "PWM", "ACMP", "CAM", "FEMC", "PWM",
-    "QEI", "TRGM",
+    "QEI", "TRGM", "PDM",
 ];
 
 fn normalize_func(module: &str, func: &str) -> String {
@@ -93,8 +93,14 @@ pub fn handle_pinmux<P: AsRef<Path>>(
         for (_alt_name, alt_def) in &pin.alts {
             if PERIPHERAL_LIST.contains(&&*alt_def.module) {
                 let signal_name = normalize_func(&alt_def.module, &alt_def.func);
+                // Normalize instance name: PDM0 -> PDM (pinmux uses PDM0, chip data uses PDM)
+                let instance = if alt_def.instance == "PDM0" {
+                    "PDM".to_string()
+                } else {
+                    alt_def.instance.clone()
+                };
                 pinmux_alt_defs.insert((
-                    alt_def.instance.clone(),
+                    instance,
                     signal_name,
                     pin.name.clone(),
                     alt_def.alt_num(),
