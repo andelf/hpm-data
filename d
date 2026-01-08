@@ -9,7 +9,7 @@ shift
 
 case "$CMD" in
     download-all)
-        git clone --depth 1 --branch v1.10.0 https://github.com/hpmicro/hpm_sdk.git
+        git clone --depth 1 --branch v1.11.0 https://github.com/hpmicro/hpm_sdk.git
 
         echo Syncing SVDs from hpm_sdk...
         find  hpm_sdk/soc -iname '*_svd.xml' -exec cp -v {} ./svd \;
