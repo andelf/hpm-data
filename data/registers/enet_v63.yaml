@@ -384,6 +384,10 @@ fieldset/AUX_TS_SEC:
 fieldset/CTRL2:
   description: Control Register 1.
   fields:
+    - name: ENET0_RMII_TXCLK_SEL
+      description: RMII mode output clock pad select. Set to use refclk from pad. refclk is always from pad, can use external clock from pad, or use internal clock output to pad then loopback.
+      bit_offset: 10
+      bit_size: 1
     - name: ENET0_FLOWCTRL
       description: flow control request.
       bit_offset: 12

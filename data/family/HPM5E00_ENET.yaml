@@ -1,0 +1,9 @@
+# HPM5E00 Series ENET peripheral
+# Same as HPM6E00/6P00 (enet_v68)
+
+- name: ENET0
+  address: 0xF1400000
+  registers:
+    kind: enet
+    version: v68
+    block: ENET
