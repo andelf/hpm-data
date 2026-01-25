@@ -41,7 +41,7 @@ struct PinmuxRaw {
 // The following peripherals are supported now.
 const PERIPHERAL_LIST: &[&str] = &[
     "GPTMR", "I2C", "SPI", "UART", "MCAN", "USB", "I2S", "PWM", "ACMP", "CAM", "FEMC", "PWM",
-    "QEI", "TRGM", "PDM", "SDC",
+    "QEI", "TRGM", "PDM", "SDC", "ETH",
 ];
 
 fn normalize_func(module: &str, func: &str) -> String {
@@ -96,11 +96,15 @@ pub fn handle_pinmux<P: AsRef<Path>>(
                 // Normalize instance name:
                 // - PDM0 -> PDM (pinmux uses PDM0, chip data uses PDM)
                 // - SDC0 -> SDXC0 (pinmux uses SDC0, chip data uses SDXC0)
+                // - ETH0 -> ENET0 (pinmux uses ETH0, chip data uses ENET0)
                 let instance = if alt_def.instance == "PDM0" {
                     "PDM".to_string()
                 } else if alt_def.instance.starts_with("SDC") {
                     // Convert SDC0 -> SDXC0, SDC1 -> SDXC1, etc.
                     alt_def.instance.replace("SDC", "SDXC")
+                } else if alt_def.instance.starts_with("ETH") {
+                    // Convert ETH0 -> ENET0, ETH1 -> ENET1, etc.
+                    alt_def.instance.replace("ETH", "ENET")
                 } else {
                     alt_def.instance.clone()
                 };
@@ -161,8 +165,6 @@ pub fn handle_pinmux<P: AsRef<Path>>(
         }
     }
 
-    // println!("Found {:#?} pinmux alt defs", pinmux_alt_defs);
-
     let mut periph_pins: HashMap<String, Vec<(String, String, u32)>> = HashMap::new();
 
     for (peripheral_name, signal_name, pin_name, alt_num) in pinmux_alt_defs {
@@ -200,6 +202,7 @@ pub fn handle_pinmux<P: AsRef<Path>>(
                         .collect()
                 })
                 .unwrap_or_default();
+
             peripheral
                 .pins
                 .sort_by(|a, b| pin_cmp_key(a).cmp(&pin_cmp_key(b)));
