@@ -566,12 +566,6 @@
     kind: enet
     version: v68
     block: ENET
-- name: ENET1
-  address: 0xF1404000
-  registers:
-    kind: enet
-    version: v68
-    block: ENET
 
 # EtherCAT
 
