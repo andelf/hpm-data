@@ -622,7 +622,7 @@
   address: 0xF0114000
   registers:
     kind: pdm
-    version: common
+    version: v67
     block: PDM
 
 - name: DAO

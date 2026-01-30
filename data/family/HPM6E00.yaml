@@ -219,7 +219,7 @@
   address: 0xF0154000
   registers:
     kind: pdm
-    version: common
+    version: v6e
     block: PDM
 
 - name: DAO
