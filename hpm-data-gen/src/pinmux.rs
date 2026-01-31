@@ -41,7 +41,7 @@ struct PinmuxRaw {
 // The following peripherals are supported now.
 const PERIPHERAL_LIST: &[&str] = &[
     "GPTMR", "I2C", "SPI", "UART", "MCAN", "USB", "I2S", "PWM", "ACMP", "CAM", "FEMC", "PWM",
-    "QEI", "TRGM", "PDM", "SDC", "ETH",
+    "QEI", "TRGM", "PDM", "SDC", "ETH", "DAO",
 ];
 
 fn normalize_func(module: &str, func: &str) -> String {

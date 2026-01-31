@@ -223,7 +223,7 @@
     block: PDM
 
 - name: DAO
-  address: 0xF0210000
+  address: 0xF0150000
   registers:
     kind: dao
     version: v68
