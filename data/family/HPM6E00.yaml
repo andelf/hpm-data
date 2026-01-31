@@ -142,7 +142,7 @@
 # FFA, CRC, DMA
 
 - name: FFA
-  address: 0xF3018000
+  address: 0xF3108000
   registers:
     kind: ffa
     version: v6e
