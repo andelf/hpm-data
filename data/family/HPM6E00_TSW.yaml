@@ -1,5 +1,5 @@
 - name: TSW
-  address: 0xF140C000
+  address: 0xF1600000
   registers:
     kind: tsw
     version: v6e

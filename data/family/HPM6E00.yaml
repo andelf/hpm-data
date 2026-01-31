@@ -133,7 +133,7 @@
     block: FEMC
 
 - name: PPI
-  address: 0xF3010000
+  address: 0xF00CC000
   registers:
     kind: ppi
     version: v6e
@@ -194,7 +194,7 @@
     block: MBX
 
 - name: CRC
-  address: 0xF00C0000
+  address: 0xF0080000
   registers:
     kind: crc
     version: common
@@ -264,7 +264,7 @@
     block: TRGM
 
 - name: SYNT
-  address: 0xF0328000
+  address: 0xF0464000
   registers:
     kind: synt
     version: v53
@@ -554,7 +554,7 @@
     block: PTPC
 
 - name: USB0
-  address: 0xF1120000
+  address: 0xF1420000
   registers:
     kind: usb
     version: v53
