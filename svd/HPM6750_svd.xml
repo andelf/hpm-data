@@ -7,7 +7,7 @@
   <description>HPM6700/HPM6400 device</description>
   <licenseText>
     /*
- * Copyright (c) 2021-2024 HPMicro
+ * Copyright (c) 2021-2025 HPMicro
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -641,7 +641,7 @@ Note: combinational interrupt is sensitive to environment noise</description>
       <baseAddress>0xe4000000</baseAddress>
       <addressBlock>
         <offset>0x0</offset>
-        <size>0x202000</size>
+        <size>0x201000</size>
         <usage>registers</usage>
       </addressBlock>
       <registers>
@@ -716,28 +716,6 @@ Note: combinational interrupt is sensitive to environment noise</description>
           </fields>
         </register>
         <register>
-          <dim>4</dim>
-          <dimIncrement>0x4</dimIncrement>
-          <dimIndex>TRIGGER0,TRIGGER1,TRIGGER2,TRIGGER3</dimIndex>
-          <name>TRIGGER[%s]</name>
-          <description>no description available</description>
-          <addressOffset>0x1080</addressOffset>
-          <size>32</size>
-          <resetValue>0x00000000</resetValue>
-          <resetMask>0xFFFFFFFF</resetMask>
-          <fields>
-            <field>
-              <name>INTERRUPT</name>
-              <description>The interrupt trigger type of interrupt sources. Every interrupt source occupies 1 bit.
-0: Level-triggered interrupt
-1: Edge-triggered interrupt</description>
-              <bitOffset>0</bitOffset>
-              <bitWidth>32</bitWidth>
-              <access>read-only</access>
-            </field>
-          </fields>
-        </register>
-        <register>
           <name>NUMBER</name>
           <description>Number of supported interrupt sources and targets</description>
           <addressOffset>0x1100</addressOffset>
@@ -784,16 +762,16 @@ Note: combinational interrupt is sensitive to environment noise</description>
           </fields>
         </register>
         <cluster>
-          <dim>2</dim>
+          <dim>1</dim>
           <dimIncrement>0x80</dimIncrement>
-          <dimIndex>target0,target1</dimIndex>
+          <dimIndex>target0</dimIndex>
           <name>TARGETINT[%s]</name>
           <description>no description available</description>
           <addressOffset>0x2000</addressOffset>
           <register>
-            <dim>4</dim>
+            <dim>6</dim>
             <dimIncrement>0x4</dimIncrement>
-            <dimIndex>INTEN0,INTEN1,INTEN2,INTEN3</dimIndex>
+            <dimIndex>INTEN0,INTEN1,INTEN2,INTEN3,INTEN4,INTEN5</dimIndex>
             <name>INTEN[%s]</name>
             <description>no description available</description>
             <addressOffset>0x0</addressOffset>
@@ -812,9 +790,9 @@ Note: combinational interrupt is sensitive to environment noise</description>
           </register>
         </cluster>
         <cluster>
-          <dim>2</dim>
+          <dim>1</dim>
           <dimIncrement>0x1000</dimIncrement>
-          <dimIndex>target0,target1</dimIndex>
+          <dimIndex>target0</dimIndex>
           <name>TARGETCONFIG[%s]</name>
           <description>no description available</description>
           <addressOffset>0x200000</addressOffset>
@@ -1179,38 +1157,6 @@ bit3: 1, invisible to cpu1 fast gpio; 0: visible to cpu1 fast gpio</description>
           </fields>
         </register>
         <register>
-          <dim>19</dim>
-          <dimIncrement>0x4</dimIncrement>
-          <dimIndex>chn0,chn1,chn2,chn3,chn4,chn5,chn6,chn7,chn8,chn9,chn10,chn11,chn12,chn13,chn14,chn15,chn16,chn17,chn18</dimIndex>
-          <name>BUS_RESULT[%s]</name>
-          <description>no description available</description>
-          <addressOffset>0x400</addressOffset>
-          <size>32</size>
-          <resetValue>0x00000000</resetValue>
-          <resetMask>0x0001FFF0</resetMask>
-          <fields>
-            <field>
-              <name>VALID</name>
-              <description>set after conversion finished if wait_dis is set, cleared after software read.
-The first time read with 0 will trigger one new conversion.
-If SW read other channel when one channel conversion is in progress, it will not trigger new conversion at other channel, and will get old result with valid 0, also with read_cflct interrupt status bit set.
-the result may not realtime if software read once and wait  long time to read again</description>
-              <bitOffset>16</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-only</access>
-            </field>
-            <field>
-              <name>CHAN_RESULT</name>
-              <description>read this register will trigger one adc conversion.
-If wait_dis bit is set, SW will get the latest conversion result(not current one) with valid bit is 0, SW need polling valid bit till it's set to get current result
-If wait_dis bit is 0, SW can get the current conversion result with holding the bus, valid bit is always set at this mode. this is not recommended if channel sample time is too long</description>
-              <bitOffset>4</bitOffset>
-              <bitWidth>12</bitWidth>
-              <access>read-only</access>
-            </field>
-          </fields>
-        </register>
-        <register>
           <name>buf_cfg0</name>
           <description>No description available</description>
           <addressOffset>0x500</addressOffset>
@@ -1511,7 +1457,7 @@ it may be updated period according to config, also may be updated due to other q
               <name>CONVERT_CLOCK_NUMBER</name>
               <description>convert clock numbers, set to 13 (0xD) for 12bit mode, which means convert need 14 adc clock cycles(based on clock after divider);
 set to 11 for 10bit mode; set to 9 for 8bit mode; set to 7 or 6bit mode;
-Ex: use 200MHz bus clock for adc, set sample_clock_number to 4, sample_clock_number_shift to 0, covert_clk_number to 13 for 12bit mode, clock_divder to 2, then each ADC conversion(plus sample) need 18(14 convert, 4 sample) cycles(66MHz).</description>
+Ex: use 200MHz bus clock for adc, set sample_clock_number to 4, sample_clock_number_shift to 0, covert_clk_number to 13 for 12bit mode, clock_divider to 2, then each ADC conversion(plus sample) need 18(14 convert, 4 sample) cycles(66MHz).</description>
               <bitOffset>4</bitOffset>
               <bitWidth>5</bitWidth>
               <access>read-write</access>
@@ -2015,38 +1961,6 @@ selrange_ldo = 1: LDO reference dvdd or vref_ldo in range [0.99;1.21]</descripti
           </fields>
         </register>
         <register>
-          <dim>8</dim>
-          <dimIncrement>0x4</dimIncrement>
-          <dimIndex>chn0,chn1,chn2,chn3,chn4,chn5,chn6,chn7</dimIndex>
-          <name>BUS_RESULT[%s]</name>
-          <description>no description available</description>
-          <addressOffset>0x400</addressOffset>
-          <size>32</size>
-          <resetValue>0x00000000</resetValue>
-          <resetMask>0x0001FFFF</resetMask>
-          <fields>
-            <field>
-              <name>VALID</name>
-              <description>set after conversion finished if wait_dis is set, cleared after software read.
-The first time read with 0 will trigger one new conversion.
-If SW read other channel when one channel conversion is in progress, it will not trigger new conversion at other channel, and will get old result with valid 0, also with read_cflct interrupt status bit set.
-the result may not realtime if software read once and wait  long time to read again</description>
-              <bitOffset>16</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-only</access>
-            </field>
-            <field>
-              <name>CHAN_RESULT</name>
-              <description>read this register will trigger one adc conversion.
-If wait_dis bit is set, SW will get the latest conversion result(not current one) with valid bit is 0, SW need polling valid bit till it's set to get current result
-If wait_dis bit is 0, SW can get the current conversion result with holding the bus, valid bit is always set at this mode. this is not recommended if channel sample time is too long</description>
-              <bitOffset>0</bitOffset>
-              <bitWidth>16</bitWidth>
-              <access>read-only</access>
-            </field>
-          </fields>
-        </register>
-        <register>
           <name>buf_cfg0</name>
           <description>No description available</description>
           <addressOffset>0x500</addressOffset>
@@ -2291,7 +2205,7 @@ it may be updated period according to config, also may be updated due to other q
           <description>no description available</description>
           <addressOffset>0x1000</addressOffset>
           <size>32</size>
-          <resetValue>0x00000000</resetValue>
+          <resetValue>0x00000001</resetValue>
           <resetMask>0x00000FFF</resetMask>
           <fields>
             <field>
@@ -2630,7 +2544,7 @@ MUST set clock_period to 0 or 1 for adc16 reg access</description>
           <addressOffset>0x1444</addressOffset>
           <size>32</size>
           <resetValue>0x00000000</resetValue>
-          <resetMask>0x03F07FFF</resetMask>
+          <resetMask>0x03F03FFF</resetMask>
           <fields>
             <field>
               <name>TEMPSNS_EN</name>
@@ -2663,13 +2577,6 @@ MUST set clock_period to 0 or 1 for adc16 reg access</description>
               <access>read-write</access>
             </field>
             <field>
-              <name>PREEMPT_EN</name>
-              <description>set to enable preemption feature</description>
-              <bitOffset>14</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
               <name>CONV_PARAM</name>
               <description>conversion parameter</description>
               <bitOffset>0</bitOffset>
@@ -2683,7 +2590,7 @@ MUST set clock_period to 0 or 1 for adc16 reg access</description>
           <description>No description available</description>
           <addressOffset>0x1460</addressOffset>
           <size>32</size>
-          <resetValue>0x00000000</resetValue>
+          <resetValue>0x00000100</resetValue>
           <resetMask>0x00001F00</resetMask>
           <fields>
             <field>
@@ -2721,16 +2628,16 @@ should set to (21-convert_clock_number+1).</description>
             <description>Configure Register</description>
             <addressOffset>0x0</addressOffset>
             <size>32</size>
-            <resetValue>0x00000000</resetValue>
-            <resetMask>0xFF7FFFFF</resetMask>
+            <resetValue>0x00000020</resetValue>
+            <resetMask>0xFF7FEFFF</resetMask>
             <fields>
               <field>
                 <name>HYST</name>
                 <description>This bitfield configure the comparator hysteresis.
-00: Hysteresis level 0
-01: Hysteresis level 1
-10: Hysteresis level 2
-11: Hysteresis level 3</description>
+0: Hysteresis about 30mV
+1: Hysteresis about 20mV
+2: Hysteresis about 10mV
+3: Disable hysteresis</description>
                 <bitOffset>30</bitOffset>
                 <bitWidth>2</bitWidth>
                 <access>read-write</access>
@@ -2825,15 +2732,6 @@ should set to (21-convert_clock_number+1).</description>
                 <access>read-write</access>
               </field>
               <field>
-                <name>SYNCEN</name>
-                <description>This bit enable the comparator output synchronization.
-0: ACMP output not synchronized with ACMP clock.
-1: ACMP output synchronized with ACMP clock.</description>
-                <bitOffset>12</bitOffset>
-                <bitWidth>1</bitWidth>
-                <access>read-write</access>
-              </field>
-              <field>
                 <name>FLTLEN</name>
                 <description>This bitfield define the ACMP output digital filter length. The unit is ACMP clock cycle.</description>
                 <bitOffset>0</bitOffset>
@@ -2852,7 +2750,7 @@ should set to (21-convert_clock_number+1).</description>
             <fields>
               <field>
                 <name>DACCFG</name>
-                <description>8bit DAC digital value output to analog block</description>
+                <description>8bit DAC digital value</description>
                 <bitOffset>0</bitOffset>
                 <bitWidth>8</bitWidth>
                 <access>read-write</access>
@@ -3867,14 +3765,14 @@ Register (FIFOE) is set to 1.</description>
           <fields>
             <field>
               <name>RFIFOT</name>
-              <description>Receiver FIFO trigger level</description>
+              <description>Receiver FIFO trigger level(0 for 1byte, 0x3 for 4bytes). Uart will send rx_dma_req if data in fifo reachs the threshold</description>
               <bitOffset>6</bitOffset>
               <bitWidth>2</bitWidth>
               <access>write-only</access>
             </field>
             <field>
               <name>TFIFOT</name>
-              <description>Transmitter FIFO trigger level</description>
+              <description>Transmitter FIFO trigger level(0 for 1byte, 0x3 for 4bytes), uart will send tx_dma_req when data in fifo is less than threshold.</description>
               <bitOffset>4</bitOffset>
               <bitWidth>2</bitWidth>
               <access>write-only</access>
@@ -6642,7 +6540,9 @@ Specifies which DMA source, if any, is routed to a particular DMA channel. See t
             </field>
             <field>
               <name>REQSYNC</name>
-              <description>DMA request synchronization. The DMA request synchronization should be configured to avoid signal integrity problems when the request signal is not clocked by the system bus clock, which the DMA control logic operates in. If the request synchronization is not configured, the request signal is sampled directly without synchronization.
+              <description>DMA request synchronization. The DMA request synchronization should be configured to avoid signal integrity problems
+when the request signal is not clocked by the system bus clock, which the DMA control logic operates in.
+If the request synchronization is not configured, the request signal is sampled directly without synchronization.
 0x0: Request synchronization is not configured
 0x1: Request synchronization is configured</description>
               <bitOffset>30</bitOffset>
@@ -6756,7 +6656,8 @@ Note: The software reset may cause the in-completion of AXI transaction.</descri
           <fields>
             <field>
               <name>CHABORT</name>
-              <description>Write 1 to bit n to abort channel n. The bits should only be set when the corresponding channels are enabled. Otherwise, the writes will be ignored for channels that are not enabled. (N: Number of channels)</description>
+              <description>Write 1 to bit n to abort channel n. The bits should only be set when the corresponding channels are enabled.
+ Otherwise, the writes will be ignored for channels that are not enabled. (N: Number of channels)</description>
               <bitOffset>0</bitOffset>
               <bitWidth>32</bitWidth>
               <access>write-only</access>
@@ -6834,26 +6735,8 @@ Note: The software reset may cause the in-completion of AXI transaction.</descri
             <addressOffset>0x0</addressOffset>
             <size>32</size>
             <resetValue>0x00000000</resetValue>
-            <resetMask>0xEFFFFFFF</resetMask>
+            <resetMask>0x2FFFFFFF</resetMask>
             <fields>
-              <field>
-                <name>SRCBUSINFIDX</name>
-                <description>Bus interface index that source data is read from
-0x0: Data is read from bus interface 0
-0x1: Data is read from bus interface</description>
-                <bitOffset>31</bitOffset>
-                <bitWidth>1</bitWidth>
-                <access>read-write</access>
-              </field>
-              <field>
-                <name>DSTBUSINFIDX</name>
-                <description>Bus interface index that destination data is written to
-0x0: Data is written to bus interface 0
-0x1: Data is written to bus interface 1</description>
-                <bitOffset>30</bitOffset>
-                <bitWidth>1</bitWidth>
-                <access>read-write</access>
-              </field>
               <field>
                 <name>PRIORITY</name>
                 <description>Channel priority level
@@ -6902,7 +6785,8 @@ for XDMA, the maximum allowed value is 0x3, for HDMA, the maximum allowed value 
               <field>
                 <name>DSTWIDTH</name>
                 <description>Destination transfer width.
-Both the total transfer byte number and the burst transfer byte number should be aligned to the destination transfer width; otherwise the error event will be triggered. For example, destination transfer width should be set as byte transfer if total transfer byte is not aligned to half-word.
+Both the total transfer byte number and the burst transfer byte number should be aligned to the destination transfer width;
+otherwise the error event will be triggered. For example, destination transfer width should be set as byte transfer if total transfer byte is not aligned to half-word.
 See field SrcBurstSize above for the definition of burst transfer byte number and section 3.2.8 for the definition of the total transfer byte number.
 0x0: Byte transfer
 0x1: Half-word transfer
@@ -7666,7 +7550,7 @@ bit2: software key 0: not selected, 1:selected</description>
           <addressOffset>0x0</addressOffset>
           <size>32</size>
           <resetValue>0x00000000</resetValue>
-          <resetMask>0xFFFFFFFF</resetMask>
+          <resetMask>0xFFF7FFFF</resetMask>
           <fields>
             <field>
               <name>SFTRST_RX</name>
@@ -9493,6 +9377,24 @@ Note: user should configure pair bit and this bitfield before PWM output is enab
           </fields>
         </register>
         <register>
+          <name>cap_en_neg</name>
+          <description>Capture irq mode</description>
+          <addressOffset>0x228</addressOffset>
+          <size>32</size>
+          <resetValue>0x00000000</resetValue>
+          <resetMask>0x00FFFFFF</resetMask>
+          <fields>
+            <field>
+              <name>CAP_EN_NEG</name>
+              <description>In capture mode, those bits setting for generate capture irq when capture falling edge.
+Default those bits is 0, generate capture irq when capture rising edge.</description>
+              <bitOffset>0</bitOffset>
+              <bitWidth>24</bitWidth>
+              <access>read-write</access>
+            </field>
+          </fields>
+        </register>
+        <register>
           <name>dmaen</name>
           <description>DMA request enable register</description>
           <addressOffset>0x22c</addressOffset>
@@ -10866,14 +10768,14 @@ Note: user should configure pair bit and this bitfield before PWM output is enab
             </field>
             <field>
               <name>FEDG2PEN</name>
-              <description>1- The selected input signal falling edge will be convert to an pulse on output.</description>
+              <description>1- The selected input signal falling edge will be convert to an pulse on output. The output pulse can be stably used within the motor control system. When connecting the signal outside the motor system, due to the asynchronization of the clock systems, the clock frequency and signal active length need to be considered.</description>
               <bitOffset>7</bitOffset>
               <bitWidth>1</bitWidth>
               <access>read-write</access>
             </field>
             <field>
               <name>REDG2PEN</name>
-              <description>1- The selected input signal rising edge will be convert to an pulse on output.</description>
+              <description>1- The selected input signal rising edge will be convert to an pulse on output. The output pulse can be stably used within the motor control system. When connecting the signal outside the motor system, due to the asynchronization of the clock systems, the clock frequency and signal active length need to be considered.</description>
               <bitOffset>6</bitOffset>
               <bitWidth>1</bitWidth>
               <access>read-write</access>
@@ -11042,7 +10944,7 @@ Note: user should configure pair bit and this bitfield before PWM output is enab
       <baseAddress>0xf1000000</baseAddress>
       <addressBlock>
         <offset>0x0</offset>
-        <size>0x404</size>
+        <size>0x400</size>
         <usage>registers</usage>
       </addressBlock>
       <registers>
@@ -11782,41 +11684,6 @@ typically -16 (0x1F0).</description>
             </fields>
           </register>
         </cluster>
-        <register>
-          <name>CLUT_LOAD</name>
-          <description>Clut Load Control Register</description>
-          <addressOffset>0x400</addressOffset>
-          <size>32</size>
-          <resetValue>0x00000000</resetValue>
-          <resetMask>0x0000007F</resetMask>
-          <fields>
-            <field>
-              <name>SEL_NUM</name>
-              <description>Selected CLUT Number
-The SEL_CLUT_NUM is used to select which plane's CLUT need to be updated. The hardware can only backup one CLUT setting and load, so the SEL_CLUT_NUM can't be changed when CLUT_LOAD[UPDATE_EN] is 1.
-. 3'h0 - PLANE 0
-. 3'h1 - PLANE 1
-. ------
-. 3'h7 - PLANE 7
-CLUT 8 can be modified via APB even when display is on.
-Currently CLUT for plane 0..7 cannot be modified via APB when display is on.  Can only be updated via CLUT_LOAD[UPDATE_EN] bit.</description>
-              <bitOffset>4</bitOffset>
-              <bitWidth>3</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>UPDATE_EN</name>
-              <description>CLUT Update Enable
-The bit is written to 1 when software want to update the Color Look Up Tables during display.
-If set to 1, software update selected CLUT due to SEL_CLUT_NUM setting, the table will be copied from CLUT8 during vertical blanking period after SHADOW_LOAD_EN is set to 1.
-If set to 0, software can update CLUT8 directly according to the CLUT memory map.
-Hardware will automatically clear this bit when selected CLUT is updated according to SEL_CLUT_NUM.</description>
-              <bitOffset>0</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-          </fields>
-        </register>
       </registers>
     </peripheral>
     <peripheral>
@@ -11836,7 +11703,7 @@ Hardware will automatically clear this bit when selected CLUT is updated accordi
           <addressOffset>0x0</addressOffset>
           <size>32</size>
           <resetValue>0x00000000</resetValue>
-          <resetMask>0xBF9AAFFF</resetMask>
+          <resetMask>0xBE9AAFFF</resetMask>
           <fields>
             <field>
               <name>COLOR_EXT</name>
@@ -11879,15 +11746,6 @@ Data in RX FIFO = 0x11223344
 0 Disable swapping
 1 Enable swapping</description>
               <bitOffset>25</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>PACK_DIR</name>
-              <description>Data Packing Direction. This bit Controls how 8-bit/10-bit image data is packed into 32-bit RX FIFO.
-0 Pack from LSB first. For image data, 0x11, 0x22, 0x33, 0x44, it will appear as 0x44332211 in RX FIFO.
-1 Pack from MSB first. For image data, 0x11, 0x22, 0x33, 0x44, it will appear as 0x11223344 in RX FIFO.</description>
-              <bitOffset>24</bitOffset>
               <bitWidth>1</bitWidth>
               <access>read-write</access>
             </field>
@@ -11963,7 +11821,6 @@ Note: YUV420 is not supported.
             <field>
               <name>SENSOR_BIT_WIDTH</name>
               <description>the bit width of the sensor
-0: 8 bits
 1: 10 bits
 3:24bits
 Others: Undefined</description>
@@ -12291,40 +12148,6 @@ As the input data from the sensor is 8-bit/pixel format, the IMAGE_WIDTH should 
               <description>AWQOS for bus fabric arbitration</description>
               <bitOffset>7</bitOffset>
               <bitWidth>4</bitWidth>
-              <access>read-write</access>
-            </field>
-          </fields>
-        </register>
-        <register>
-          <name>DMASA_UV1</name>
-          <description>Pixel UV DMA Frame Buffer 1 Address</description>
-          <addressOffset>0x50</addressOffset>
-          <size>32</size>
-          <resetValue>0x00000000</resetValue>
-          <resetMask>0xFFFFFFFF</resetMask>
-          <fields>
-            <field>
-              <name>PTR</name>
-              <description>Two Plane UV Buffer Start Address 1</description>
-              <bitOffset>2</bitOffset>
-              <bitWidth>30</bitWidth>
-              <access>read-write</access>
-            </field>
-          </fields>
-        </register>
-        <register>
-          <name>DMASA_UV2</name>
-          <description>Pixel UV DMA Frame Buffer 2 Address</description>
-          <addressOffset>0x54</addressOffset>
-          <size>32</size>
-          <resetValue>0x00000000</resetValue>
-          <resetMask>0xFFFFFFFF</resetMask>
-          <fields>
-            <field>
-              <name>PTR</name>
-              <description>Two Plane UV Buffer Start Address 2</description>
-              <bitOffset>2</bitOffset>
-              <bitWidth>30</bitWidth>
               <access>read-write</access>
             </field>
           </fields>
@@ -16863,224 +16686,8 @@ counters.</description>
           <addressOffset>0x200</addressOffset>
           <size>32</size>
           <resetValue>0x00000000</resetValue>
-          <resetMask>0x3FFF3FFF</resetMask>
+          <resetMask>0x00000001</resetMask>
           <fields>
-            <field>
-              <name>RXICMPEROIM</name>
-              <description>MMC Receive ICMP Error Octet Counter Interrupt Mask
-Setting this bit masks the interrupt when the rxicmp_err_octets counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>29</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXICMPGOIM</name>
-              <description>MMC Receive ICMP Good Octet Counter Interrupt Mask
-Setting this bit masks the interrupt when the rxicmp_gd_octets counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>28</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXTCPEROIM</name>
-              <description>MMC Receive TCP Error Octet Counter Interrupt Mask
-Setting this bit masks the interrupt when the rxtcp_err_octets counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>27</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXTCPGOIM</name>
-              <description>MMC Receive TCP Good Octet Counter Interrupt Mask
-Setting this bit masks the interrupt when the rxtcp_gd_octets counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>26</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXUDPEROIM</name>
-              <description>MMC Receive UDP Good Octet Counter Interrupt Mask
-Setting this bit masks the interrupt when the rxudp_err_octets counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>25</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXUDPGOIM</name>
-              <description>MMC Receive IPV6 No Payload Octet Counter Interrupt Mask
-Setting this bit masks the interrupt when the rxudp_gd_octets counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>24</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXIPV6NOPAYOIM</name>
-              <description>MMC Receive IPV6 Header Error Octet Counter Interrupt Mask
-Setting this bit masks the interrupt when the rxipv6_nopay_octets counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>23</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXIPV6HEROIM</name>
-              <description>MMC Receive IPV6 Good Octet Counter Interrupt Mask
-Setting this bit masks the interrupt when the rxipv6_hdrerr_octets counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>22</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXIPV6GOIM</name>
-              <description>MMC Receive IPV6 Good Octet Counter Interrupt Mask
-Setting this bit masks the interrupt when the rxipv6_gd_octets counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>21</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXIPV4UDSBLOIM</name>
-              <description>MMC Receive IPV4 UDP Checksum Disabled Octet Counter Interrupt Mask
-Setting this bit masks the interrupt when the rxipv4_udsbl_octets counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>20</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXIPV4FRAGOIM</name>
-              <description>MMC Receive IPV4 Fragmented Octet Counter Interrupt Mask
-Setting this bit masks the interrupt when the rxipv4_frag_octets counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>19</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXIPV4NOPAYOIM</name>
-              <description>MMC Receive IPV4 No Payload Octet Counter Interrupt Mask
-Setting this bit masks the interrupt when the rxipv4_nopay_octets counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>18</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXIPV4HEROIM</name>
-              <description>MMC Receive IPV4 Header Error Octet Counter Interrupt Mask
-Setting this bit masks the interrupt when the rxipv4_hdrerr_octets counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>17</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXIPV4GOIM</name>
-              <description>MMC Receive IPV4 Good Octet Counter Interrupt Mask
-Setting this bit masks the interrupt when the rxipv4_gd_octets counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>16</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXICMPERFIM</name>
-              <description>MMC Receive ICMP Error Frame Counter Interrupt Mask
-Setting this bit masks the interrupt when the rxicmp_err_frms counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>13</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXICMPGFIM</name>
-              <description>MMC Receive ICMP Good Frame Counter Interrupt Mask
-Setting this bit masks the interrupt when the rxicmp_gd_frms counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>12</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXTCPERFIM</name>
-              <description>MMC Receive TCP Error Frame Counter Interrupt Mask
-Setting this bit masks the interrupt when the rxtcp_err_frms counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>11</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXTCPGFIM</name>
-              <description>MMC Receive TCP Good Frame Counter Interrupt Mask
-Setting this bit masks the interrupt when the rxtcp_gd_frms counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>10</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXUDPERFIM</name>
-              <description>MMC Receive UDP Error Frame Counter Interrupt Mask
-Setting this bit masks the interrupt when the rxudp_err_frms counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>9</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXUDPGFIM</name>
-              <description>MMC Receive UDP Good Frame Counter Interrupt Mask
-Setting this bit masks the interrupt when the rxudp_gd_frms counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>8</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXIPV6NOPAYFIM</name>
-              <description>MMC Receive IPV6 No Payload Frame Counter Interrupt Mask
-Setting this bit masks the interrupt when the rxipv6_nopay_frms counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>7</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXIPV6HERFIM</name>
-              <description>MMC Receive IPV6 Header Error Frame Counter Interrupt Mask
-Setting this bit masks the interrupt when the rxipv6_hdrerr_frms counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>6</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXIPV6GFIM</name>
-              <description>MMC Receive IPV6 Good Frame Counter Interrupt Mask
-Setting this bit masks the interrupt when the rxipv6_gd_frms counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>5</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXIPV4UDSBLFIM</name>
-              <description>MMC Receive IPV4 UDP Checksum Disabled Frame Counter Interrupt Mask
-Setting this bit masks the interrupt when the rxipv4_udsbl_frms counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>4</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXIPV4FRAGFIM</name>
-              <description>MMC Receive IPV4 Fragmented Frame Counter Interrupt Mask
-Setting this bit masks the interrupt when the rxipv4_frag_frms counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>3</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXIPV4NOPAYFIM</name>
-              <description>MMC Receive IPV4 No Payload Frame Counter Interrupt Mask
-Setting this bit masks the interrupt when the rxipv4_nopay_frms counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>2</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXIPV4HERFIM</name>
-              <description>MMC Receive IPV4 Header Error Frame Counter Interrupt Mask
-Setting this bit masks the interrupt when the rxipv4_hdrerr_frms counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>1</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
             <field>
               <name>RXIPV4GFIM</name>
               <description>MMC Receive IPV4 Good Frame Counter Interrupt Mask
@@ -17099,224 +16706,8 @@ for further detail.</description>
           <addressOffset>0x208</addressOffset>
           <size>32</size>
           <resetValue>0x00000000</resetValue>
-          <resetMask>0x3FFF3FFF</resetMask>
+          <resetMask>0x00000001</resetMask>
           <fields>
-            <field>
-              <name>RXICMPEROIS</name>
-              <description>MMC Receive ICMP Error Octet Counter Interrupt Status
-This bit is set when the rxicmp_err_octets counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>29</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXICMPGOIS</name>
-              <description>MMC Receive ICMP Good Octet Counter Interrupt Status
-This bit is set when the rxicmp_gd_octets counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>28</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXTCPEROIS</name>
-              <description>MMC Receive TCP Error Octet Counter Interrupt Status
-This bit is set when the rxtcp_err_octets counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>27</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXTCPGOIS</name>
-              <description>MMC Receive TCP Good Octet Counter Interrupt Status
-This bit is set when the rxtcp_gd_octets counter reaches half of the maximum value or the maximum value</description>
-              <bitOffset>26</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXUDPEROIS</name>
-              <description>MMC Receive UDP Error Octet Counter Interrupt Status
-This bit is set when the rxudp_err_octets counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>25</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXUDPGOIS</name>
-              <description>MMC Receive UDP Good Octet Counter Interrupt Status
-This bit is set when the rxudp_gd_octets counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>24</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXIPV6NOPAYOIS</name>
-              <description>MMC Receive IPV6 No Payload Octet Counter Interrupt Status
-This bit is set when the rxipv6_nopay_octets counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>23</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXIPV6HEROIS</name>
-              <description>MMC Receive IPV6 Header Error Octet Counter Interrupt Status
-This bit is set when the rxipv6_hdrerr_octets counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>22</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXIPV6GOIS</name>
-              <description>MMC Receive IPV6 Good Octet Counter Interrupt Status
-This bit is set when the rxipv6_gd_octets counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>21</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXIPV4UDSBLOIS</name>
-              <description>MMC Receive IPV4 UDP Checksum Disabled Octet Counter Interrupt Status
-This bit is set when the rxipv4_udsbl_octets counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>20</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXIPV4FRAGOIS</name>
-              <description>MMC Receive IPV4 Fragmented Octet Counter Interrupt Status
-This bit is set when the rxipv4_frag_octets counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>19</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXIPV4NOPAYOIS</name>
-              <description>MMC Receive IPV4 No Payload Octet Counter Interrupt Status
-This bit is set when the rxipv4_nopay_octets counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>18</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXIPV4HEROIS</name>
-              <description>MMC Receive IPV4 Header Error Octet Counter Interrupt Status
-This bit is set when the rxipv4_hdrerr_octets counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>17</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXIPV4GOIS</name>
-              <description>MMC Receive IPV4 Good Octet Counter Interrupt Status
-This bit is set when the rxipv4_gd_octets counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>16</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXICMPERFIS</name>
-              <description>MMC Receive ICMP Error Frame Counter Interrupt Status
-This bit is set when the rxicmp_err_frms counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>13</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXICMPGFIS</name>
-              <description>MMC Receive ICMP Good Frame Counter Interrupt Status
-This bit is set when the rxicmp_gd_frms counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>12</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXTCPERFIS</name>
-              <description>MMC Receive TCP Error Frame Counter Interrupt Status
-This bit is set when the rxtcp_err_frms counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>11</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXTCPGFIS</name>
-              <description>MMC Receive TCP Good Frame Counter Interrupt Status
-This bit is set when the rxtcp_gd_frms counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>10</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXUDPERFIS</name>
-              <description>MMC Receive UDP Error Frame Counter Interrupt Status
-This bit is set when the rxudp_err_frms counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>9</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXUDPGFIS</name>
-              <description>MMC Receive UDP Good Frame Counter Interrupt Status
-This bit is set when the rxudp_gd_frms counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>8</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXIPV6NOPAYFIS</name>
-              <description>MMC Receive IPV6 No Payload Frame Counter Interrupt Status
-This bit is set when the rxipv6_nopay_frms counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>7</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXIPV6HERFIS</name>
-              <description>MMC Receive IPV6 Header Error Frame Counter Interrupt Status
-This bit is set when the rxipv6_hdrerr_frms counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>6</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXIPV6GFIS</name>
-              <description>MMC Receive IPV6 Good Frame Counter Interrupt Status
-This bit is set when the rxipv6_gd_frms counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>5</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXIPV4UDSBLFIS</name>
-              <description>MMC Receive IPV4 UDP Checksum Disabled Frame Counter Interrupt Status
-This bit is set when the rxipv4_udsbl_frms counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>4</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXIPV4FRAGFIS</name>
-              <description>MMC Receive IPV4 Fragmented Frame Counter Interrupt Status
-This bit is set when the rxipv4_frag_frms counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>3</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXIPV4NOPAYFIS</name>
-              <description>MMC Receive IPV4 No Payload Frame Counter Interrupt Status
-This bit is set when the rxipv4_nopay_frms counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>2</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
-            <field>
-              <name>RXIPV4HERFIS</name>
-              <description>MMC Receive IPV4 Header Error Frame Counter Interrupt Status
-This bit is set when the rxipv4_hdrerr_frms counter reaches half of the maximum value or the maximum value.</description>
-              <bitOffset>1</bitOffset>
-              <bitWidth>1</bitWidth>
-              <access>read-write</access>
-            </field>
             <field>
               <name>RXIPV4GFIS</name>
               <description>MMC Receive IPV4 Good Frame Counter Interrupt Status
@@ -18276,7 +17667,13 @@ The actual clock is of different frequency that gets synchronized every second. 
 - When PPSCTRL = 0011, the PPS (4 Hz) is a sequence of:
   - Three clocks of 50 percent duty cycle and 268 ms period
   - Fourth clock of 195 ms period (134 ms low and 61 ms high)
+--------------------------------------------------------------------------------------------------------------------------------------
 PPSCMD0: Flexible PPS0 Output Control
+Programming these bits with a non-zero value instructs the MAC to
+initiate an event. When the command is transferred or synchronized to
+the PTP clock domain, these bits get cleared automatically. The
+Software should ensure that these bits are programmed only when they
+are “all-zero”.
 0000: No Command
 0001: START Single Pulse
 This command generates single pulse rising at the start point defined in
@@ -18339,7 +17736,8 @@ Note: These bits get cleared automatically</description>
           <fields>
             <field>
               <name>AUXTSHI</name>
-              <description>Contains the lower 32 bits of the Seconds field of the auxiliary timestamp.</description>
+              <description>Contains the lower 32 bits of the Seconds field of the auxiliary timestamp.
+Note: The top of the FIFO is removed only when the last byte of AUX_TS_SEC is read.</description>
               <bitOffset>0</bitOffset>
               <bitWidth>32</bitWidth>
               <access>read-only</access>
@@ -18776,7 +18174,7 @@ Note: GTMSI status is given only in Channel 1 and Channel 2 DMA register when th
 Otherwise, this bit is reserved. When this bit is high, the interrupt signal from the MAC (sbd_intr_o) is high.</description>
               <bitOffset>30</bitOffset>
               <bitWidth>1</bitWidth>
-              <access>read-write</access>
+              <access>read-only</access>
             </field>
             <field>
               <name>TTI</name>
@@ -18787,7 +18185,7 @@ The software must read the corresponding registers in the DWC_gmac to get the ex
 This bit is applicable only when the IEEE 1588 Timestamp feature is enabled. Otherwise, this bit is reserved.</description>
               <bitOffset>29</bitOffset>
               <bitWidth>1</bitWidth>
-              <access>read-write</access>
+              <access>read-only</access>
             </field>
             <field>
               <name>GPI</name>
@@ -18799,7 +18197,7 @@ This bit is applicable only when the Power Management feature is enabled.
 Otherwise, this bit is reserved. Note: The GPI and pmt_intr_o interrupts are generated in different clock domains.</description>
               <bitOffset>28</bitOffset>
               <bitWidth>1</bitWidth>
-              <access>read-write</access>
+              <access>read-only</access>
             </field>
             <field>
               <name>GMI</name>
@@ -18811,7 +18209,7 @@ The interrupt signal from the DWC_gmac subsystem (sbd_intr_o) is high when this 
 This bit is applicable only when the MAC Management Counters (MMC) are enabled. Otherwise, this bit is reserved.</description>
               <bitOffset>27</bitOffset>
               <bitWidth>1</bitWidth>
-              <access>read-write</access>
+              <access>read-only</access>
             </field>
             <field>
               <name>GLI</name>
@@ -18827,7 +18225,7 @@ When set, this bit reflects any of the following interrupt events in the DWC_gma
 - General Purpose Input (GPI): Register 56 (General Purpose IO Register) The interrupt signal from the DWC_gmac subsystem (sbd_intr_o) is high when this bit is high.</description>
               <bitOffset>26</bitOffset>
               <bitWidth>1</bitWidth>
-              <access>read-write</access>
+              <access>read-only</access>
             </field>
             <field>
               <name>EB</name>
@@ -18842,7 +18240,7 @@ This field indicates the type of error that caused a Bus Error, for example, err
 - 1 1 1: Error during Tx DMA Descriptor Read Access Note: 001 and 010 are reserved.</description>
               <bitOffset>23</bitOffset>
               <bitWidth>3</bitWidth>
-              <access>read-write</access>
+              <access>read-only</access>
             </field>
             <field>
               <name>TS</name>
@@ -18858,7 +18256,7 @@ This field indicates the Transmit DMA FSM state. This field does not generate an
 - 3’b111: Running; Closing Transmit Descriptor</description>
               <bitOffset>20</bitOffset>
               <bitWidth>3</bitWidth>
-              <access>read-write</access>
+              <access>read-only</access>
             </field>
             <field>
               <name>RS</name>
@@ -18874,7 +18272,7 @@ This field indicates the Receive DMA FSM state. This field does not generate an 
 - 3’b111: Running: Transferring the receive packet data from receive buffer to host memory</description>
               <bitOffset>17</bitOffset>
               <bitWidth>3</bitWidth>
-              <access>read-write</access>
+              <access>read-only</access>
             </field>
             <field>
               <name>NIS</name>
@@ -18889,7 +18287,7 @@ Register 7 (Interrupt Enable Register):
  This is a sticky bit and must be cleared (by writing 1 to this bit) each time a corresponding bit, which causes NIS to be set, is cleared.</description>
               <bitOffset>16</bitOffset>
               <bitWidth>1</bitWidth>
-              <access>read-write</access>
+              <access>write-only</access>
             </field>
             <field>
               <name>AIS</name>
@@ -18908,7 +18306,7 @@ when the corresponding interrupt bits are enabled in Register 7 (Interrupt Enabl
 This is a sticky bit and must be cleared (by writing 1 to this bit) each time a corresponding bit, which causes AIS to be set, is cleared.</description>
               <bitOffset>15</bitOffset>
               <bitWidth>1</bitWidth>
-              <access>read-write</access>
+              <access>write-only</access>
             </field>
             <field>
               <name>ERI</name>
@@ -18916,7 +18314,7 @@ This is a sticky bit and must be cleared (by writing 1 to this bit) each time a 
 This bit indicates that the DMA filled the first data buffer of the packet. This bit is cleared when the software writes 1 to this bit or Bit 6 (RI) of this register is set (whichever occurs earlier).</description>
               <bitOffset>14</bitOffset>
               <bitWidth>1</bitWidth>
-              <access>read-write</access>
+              <access>write-only</access>
             </field>
             <field>
               <name>FBI</name>
@@ -18924,7 +18322,7 @@ This bit indicates that the DMA filled the first data buffer of the packet. This
 This bit indicates that a bus error occurred, as described in Bits [25:23]. When this bit is set, the corresponding DMA engine disables all of its bus accesses.</description>
               <bitOffset>13</bitOffset>
               <bitWidth>1</bitWidth>
-              <access>read-write</access>
+              <access>write-only</access>
             </field>
             <field>
               <name>ETI</name>
@@ -18932,7 +18330,7 @@ This bit indicates that a bus error occurred, as described in Bits [25:23]. When
 This bit indicates that the frame to be transmitted is fully transferred to the MTL Transmit FIFO.</description>
               <bitOffset>10</bitOffset>
               <bitWidth>1</bitWidth>
-              <access>read-write</access>
+              <access>write-only</access>
             </field>
             <field>
               <name>RWT</name>
@@ -18940,7 +18338,7 @@ This bit indicates that the frame to be transmitted is fully transferred to the 
 When set, this bit indicates that the Receive Watchdog Timer expired while receiving the current frame and the current frame is truncated after the watchdog timeout.</description>
               <bitOffset>9</bitOffset>
               <bitWidth>1</bitWidth>
-              <access>read-write</access>
+              <access>write-only</access>
             </field>
             <field>
               <name>RPS</name>
@@ -18948,7 +18346,7 @@ When set, this bit indicates that the Receive Watchdog Timer expired while recei
 This bit is asserted when the Receive Process enters the Stopped state.</description>
               <bitOffset>8</bitOffset>
               <bitWidth>1</bitWidth>
-              <access>read-write</access>
+              <access>write-only</access>
             </field>
             <field>
               <name>RU</name>
@@ -18960,18 +18358,16 @@ The Receive Process is suspended. To resume processing Receive descriptors,
 This bit is set only when the previous Receive Descriptor is owned by the DMA.</description>
               <bitOffset>7</bitOffset>
               <bitWidth>1</bitWidth>
-              <access>read-write</access>
+              <access>write-only</access>
             </field>
             <field>
               <name>RI</name>
               <description>Receive Interrupt
-This bit indicates that the frame reception is complete.
-When reception is complete, the Bit 31 of RDES1 (Disable Interrupt on Completion) is reset in the last Descriptor,
-and the specific frame status information is updated in the descriptor.
+This bit indicates that the frame reception is complete and the specific frame status information is updated in the descriptor.
 The reception remains in the Running state.</description>
               <bitOffset>6</bitOffset>
               <bitWidth>1</bitWidth>
-              <access>read-write</access>
+              <access>write-only</access>
             </field>
             <field>
               <name>UNF</name>
@@ -18979,7 +18375,7 @@ The reception remains in the Running state.</description>
 This bit indicates that the Transmit Buffer had an Underflow during frame transmission. Transmission is suspended and an Underflow Error TDES0[1] is set.</description>
               <bitOffset>5</bitOffset>
               <bitWidth>1</bitWidth>
-              <access>read-write</access>
+              <access>write-only</access>
             </field>
             <field>
               <name>OVF</name>
@@ -18987,7 +18383,7 @@ This bit indicates that the Transmit Buffer had an Underflow during frame transm
 This bit indicates that the Receive Buffer had an Overflow during frame reception. If the partial frame is transferred to the application, the overflow status is set in RDES0[11].</description>
               <bitOffset>4</bitOffset>
               <bitWidth>1</bitWidth>
-              <access>read-write</access>
+              <access>write-only</access>
             </field>
             <field>
               <name>TJT</name>
@@ -18996,7 +18392,7 @@ This bit indicates that the Transmit Jabber Timer expired, which happens when th
 When the Jabber Timeout occurs, the transmission process is aborted and placed in the Stopped state. This causes the Transmit Jabber Timeout TDES0[14] flag to assert.</description>
               <bitOffset>3</bitOffset>
               <bitWidth>1</bitWidth>
-              <access>read-write</access>
+              <access>write-only</access>
             </field>
             <field>
               <name>TU</name>
@@ -19005,7 +18401,7 @@ This bit indicates that the host owns the Next Descriptor in the Transmit List a
 To resume processing Transmit descriptors, the host should change the ownership of the descriptor by setting TDES0[31] and then issue a Transmit Poll Demand command.</description>
               <bitOffset>2</bitOffset>
               <bitWidth>1</bitWidth>
-              <access>read-write</access>
+              <access>write-only</access>
             </field>
             <field>
               <name>TPS</name>
@@ -19013,7 +18409,7 @@ To resume processing Transmit descriptors, the host should change the ownership 
 This bit is set when the transmission is stopped.</description>
               <bitOffset>1</bitOffset>
               <bitWidth>1</bitWidth>
-              <access>read-write</access>
+              <access>write-only</access>
             </field>
             <field>
               <name>TI</name>
@@ -19021,7 +18417,7 @@ This bit is set when the transmission is stopped.</description>
 This bit indicates that the frame transmission is complete. When transmission is complete, Bit 31 (OWN) of TDES0 is reset, and the specific frame status information is updated in the descriptor.</description>
               <bitOffset>0</bitOffset>
               <bitWidth>1</bitWidth>
-              <access>read-write</access>
+              <access>write-only</access>
             </field>
           </fields>
         </register>
@@ -20269,7 +19665,7 @@ User should set this bit before set CMPEN to 1.</description>
               <description>set this bitfield to trigger software counter sync event</description>
               <bitOffset>0</bitOffset>
               <bitWidth>4</bitWidth>
-              <access>read-write</access>
+              <access>write-only</access>
             </field>
           </fields>
         </register>
@@ -22250,7 +21646,7 @@ Bit.</description>
           <addressOffset>0x210</addressOffset>
           <size>32</size>
           <resetValue>0x00000000</resetValue>
-          <resetMask>0x02007007</resetMask>
+          <resetMask>0x02007807</resetMask>
           <fields>
             <field>
               <name>GPIO_ID_SEL_N</name>
@@ -22277,6 +21673,13 @@ Bit.</description>
               <name>VBUS_VALID_OVERRIDE</name>
               <description>No description available</description>
               <bitOffset>12</bitOffset>
+              <bitWidth>1</bitWidth>
+              <access>read-write</access>
+            </field>
+            <field>
+              <name>OP_MODE_SUSPENDM_ENJ</name>
+              <description>set op_mode to 2'b01 in suspend, for naneng usbphy</description>
+              <bitOffset>11</bitOffset>
               <bitWidth>1</bitWidth>
               <access>read-write</access>
             </field>
@@ -22320,7 +21723,9 @@ Bit.</description>
             </field>
             <field>
               <name>UTMI_OTG_SUSPENDM</name>
-              <description>OTG suspend, not utmi_suspendm</description>
+              <description>OTG suspend, not utmi_suspendm.
+setting this bit also enable host high-speed disconnect detection logic(check DP/DM voltage at end of SOF, to determine whether 50Ohm are still there on DP/DM)
+should clear this bit before entering into suspend state(setting portsc.phcd), avoide unwanted glitch on vbus/sess_vld/sess_end</description>
               <bitOffset>1</bitOffset>
               <bitWidth>1</bitWidth>
               <access>read-write</access>
@@ -27800,7 +27205,7 @@ Reset all internal logic in SEMC except configuration register</description>
               <name>IO_CSX</name>
               <description>IO_CSX output selection
 0001b - SDRAM CS1
-0110b - SRAM CE#</description>
+0110b - SRAM CE0#</description>
               <bitOffset>4</bitOffset>
               <bitWidth>4</bitWidth>
               <access>read-write</access>
@@ -28314,7 +27719,7 @@ number of Auto-Refresh command cycle sent to all SDRAM device in one refresh per
         </register>
         <register>
           <name>SRCTRL0</name>
-          <description>SRAM control register 0</description>
+          <description>SRAM0 control register 0</description>
           <addressOffset>0x70</addressOffset>
           <size>32</size>
           <resetValue>0x00000000</resetValue>
@@ -28360,7 +27765,7 @@ number of Auto-Refresh command cycle sent to all SDRAM device in one refresh per
         </register>
         <register>
           <name>SRCTRL1</name>
-          <description>SRAM control register 1</description>
+          <description>SRAM0 control register 1</description>
           <addressOffset>0x74</addressOffset>
           <size>32</size>
           <resetValue>0x00000000</resetValue>
@@ -30924,14 +30329,14 @@ XX0: turn off
             </field>
             <field>
               <name>OL_THRE</name>
-              <description>overload for threshold for lod power mode</description>
+              <description>overload threshold in low power mode</description>
               <bitOffset>8</bitOffset>
               <bitWidth>2</bitWidth>
               <access>read-write</access>
             </field>
             <field>
               <name>OL_HYST</name>
-              <description>current hysteres range
+              <description>voltage ripple threshold in low power mode
 0: 12.5mV
 1: 25mV</description>
               <bitOffset>4</bitOffset>
