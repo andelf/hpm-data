@@ -179,6 +179,9 @@ fn main() -> anyhow::Result<()> {
             name if name.starts_with("HPM68") => data_dir.join("pinmux/HPM6880.json"),
             name if name.starts_with("HPM63") => data_dir.join("pinmux/HPM6364.json"),
             name if name.starts_with("HPM6E") => data_dir.join("pinmux/HPM6E80.json"),
+            name if name == "HPM5E11" => data_dir.join("pinmux/HPM5E11.json"),
+            name if name == "HPM5E31" => data_dir.join("pinmux/HPM5E31.json"),
+            name if name == "HPM5E3Y" => data_dir.join("pinmux/HPM5E3Y.json"),
             _ => {
                 println!("TODO: handle pinmux for {}", chip.name);
                 continue;

@@ -26,6 +26,7 @@ pub fn add_trgmmux_from_sdk<P: AsRef<Path>>(
 
     let header_file = match chip_name {
         n if n.starts_with("HPM53") => sdk_path.join("soc/HPM5300/HPM5361/hpm_trgmmux_src.h"),
+        n if n.starts_with("HPM5E") => sdk_path.join("soc/HPM5E00/HPM5E31/hpm_trgmmux_src.h"),
         n if n.starts_with("HPM62") => sdk_path.join("soc/HPM6200/HPM6280/hpm_trgmmux_src.h"),
         n if n.starts_with("HPM63") => sdk_path.join("soc/HPM6300/HPM6360/hpm_trgmmux_src.h"),
         n if n.starts_with("HPM67") || n.starts_with("HPM64") => {

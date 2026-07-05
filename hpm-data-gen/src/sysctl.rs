@@ -24,6 +24,13 @@ static HPM5300_SYSCTL: LazyLock<SysctlInfo> = LazyLock::new(|| {
     )
     .expect("Failed to load HPM5300 sysctl info")
 });
+static HPM5E00_SYSCTL: LazyLock<SysctlInfo> = LazyLock::new(|| {
+    load_sysctl_info_from_header(
+        "HPM5E00",
+        HPM_SDK_BASE.join("soc/HPM5E00/ip/hpm_sysctl_regs.h"),
+    )
+    .expect("Failed to load HPM5E00 sysctl info")
+});
 static HPM6200_SYSCTL: LazyLock<SysctlInfo> = LazyLock::new(|| {
     load_sysctl_info_from_header(
         "HPM6200",
@@ -227,7 +234,7 @@ pub fn add_sysctl_from_sdk<P: AsRef<Path>>(
 
     let info = match chip_name {
         n if n.starts_with("HPM53") => &HPM5300_SYSCTL,
-        n if n.starts_with("HPM5E") => &HPM5300_SYSCTL, // HPM5E series use HPM5300 SYSCTL
+        n if n.starts_with("HPM5E") => &HPM5E00_SYSCTL,
         n if n.starts_with("HPM62") => &HPM6200_SYSCTL,
         n if n.starts_with("HPM63") => &HPM6300_SYSCTL,
         n if n.starts_with("HPM67") || n.starts_with("HPM64") => &HPM6700_SYSCTL,

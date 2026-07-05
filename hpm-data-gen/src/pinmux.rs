@@ -68,6 +68,9 @@ fn get_pmic_periph_and_func(func: &str) -> Option<(String, String)> {
 fn convert_acmp_func(instance: &str, func: &str) -> String {
     if func.contains("_") && func.starts_with("CMP") {
         func.to_string()
+    } else if let Some((_, channel)) = instance.split_once("_CH") {
+        let channel_no: u32 = channel.parse::<u32>().unwrap();
+        format!("CMP{}_{}", channel_no, func)
     } else if !func.contains("_") && instance.starts_with("ACMP") {
         // for 6E00
         let inst_no: u32 = instance[4..].parse::<u32>().unwrap();
@@ -143,8 +146,13 @@ pub fn handle_pinmux<P: AsRef<Path>>(
 
                     pinmux_alt_defs.insert((periph, signal_name, pin.name.clone(), 0));
                 } else if alt_def.instance.starts_with("ACMP") {
-                    let periph = alt_def.instance.to_string();
-                    let signal_name = convert_acmp_func(&periph, &alt_def.func);
+                    let periph = alt_def
+                        .instance
+                        .split_once("_CH")
+                        .map(|(periph, _)| periph)
+                        .unwrap_or(&alt_def.instance)
+                        .to_string();
+                    let signal_name = convert_acmp_func(&alt_def.instance, &alt_def.func);
 
                     pinmux_alt_defs.insert((periph, signal_name, pin.name.clone(), 0));
                 }

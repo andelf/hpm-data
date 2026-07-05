@@ -34,6 +34,8 @@ cores:
   ip-core: Andes D25F
   include_peripherals:
   - ../family/COMMON.yaml
+  - ../family/HPM5E00.yaml
   - ../family/HPM5E00_ENET.yaml
   gen_dma_channels:
     HDMA: 32
+    XDMA: 32

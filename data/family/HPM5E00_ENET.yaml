@@ -7,3 +7,10 @@
     kind: enet
     version: v68
     block: ENET
+
+- name: ESC
+  address: 0xF1700000
+  registers:
+    kind: esc
+    version: v6e
+    block: ESC
